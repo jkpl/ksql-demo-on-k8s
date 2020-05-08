@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ksql-demo
+  labels:
+    app: ksql-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ksql-demo
+  template:
+    metadata:
+      labels:
+        app: ksql-demo
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5556"
+    spec:
+      containers:
+      - name: ksql-demo
+        image: ksql-demo
+        imagePullPolicy: Never
+        ports:
+        - name: prometheus
+          containerPort: 5556
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 512Mi
+        env:
+        - name: KSQL_BOOTSTRAP_SERVERS
+          value: PLAINTEXT://kafka-cp-kafka-headless:9092
+        - name: KSQL_KSQL_SCHEMA_REGISTRY_URL
+          value: http://kafka-cp-schema-registry:8081
